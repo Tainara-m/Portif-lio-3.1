@@ -4,8 +4,6 @@ Portfólio criativo moderno com foco em **UI/UX, Front-end e produto digital**.
 
 Desenvolvido com HTML, CSS e JavaScript puro, o projeto aplica conceitos de design system, glassmorphism, navegação responsiva e microinterações para criar uma experiência elegante, moderna e profissional.
 
-🔗 Deploy: https://tainara-m.github.io/Portifolio3.0/
-
 ---
 
 ## 🎯 Objetivo do Projeto
