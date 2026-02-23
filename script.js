@@ -1,4 +1,4 @@
-// === Scroll Reveal com IntersectionObserver (melhor performance) ===
+// Reveal + Ano
 document.addEventListener("DOMContentLoaded", () => {
   const observer = new IntersectionObserver(
     (entries) => {
@@ -10,26 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   document.querySelectorAll(".hidden").forEach((el) => observer.observe(el));
+
+  const yearEl = document.getElementById("year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 });
 
-// === Sidebar Inicialmente Colapsada ===
-const sidebar = document.getElementById("sidebar");
-const collapseIcon = document.getElementById("collapse-icon");
-
-// Define estado inicial
-sidebar.classList.remove("expanded");
-collapseIcon.classList.remove("fa-angle-double-left");
-collapseIcon.classList.add("fa-angle-double-right");
-
-// Alterna sidebar (desktop)
-document.querySelector(".toggle-sidebar").addEventListener("click", () => {
-  sidebar.classList.toggle("expanded");
-  const expanded = sidebar.classList.contains("expanded");
-  collapseIcon.classList.toggle("fa-angle-double-left", expanded);
-  collapseIcon.classList.toggle("fa-angle-double-right", !expanded);
-});
-
-// Marca item ativo no menu
+// Ativo no menu (clique)
 document.querySelectorAll(".menu-item").forEach((item) => {
   item.addEventListener("click", function () {
     document.querySelectorAll(".menu-item").forEach((i) => i.classList.remove("active"));
@@ -37,59 +23,49 @@ document.querySelectorAll(".menu-item").forEach((item) => {
   });
 });
 
-// === Fundo animado com bolhas ===
-const coresBolhas = ['#065F6A', '#072f35ff', '#39a0adff', '#12383dff', '#60d3e2ff'];
-const container = document.querySelector(".bolhas-container");
-
-for (let i = 0; i < 30; i++) {
-  const bolha = document.createElement("div");
-  bolha.classList.add("bolha");
-
-  const tamanho = Math.random() * 20 + 10;
-  bolha.style.width = `${tamanho}px`;
-  bolha.style.height = `${tamanho}px`;
-  bolha.style.left = `${Math.random() * 100}%`;
-  bolha.style.animationDuration = `${Math.random() * 10 + 5}s`;
-  bolha.style.backgroundColor = coresBolhas[Math.floor(Math.random() * coresBolhas.length)];
-
-  container.appendChild(bolha);
+// Hamburger + overlay (mobile)
+let hamburger = document.querySelector(".hamburger");
+if (!hamburger) {
+  hamburger = document.createElement("button");
+  hamburger.classList.add("hamburger");
+  hamburger.setAttribute("aria-label", "Abrir menu");
+  hamburger.innerHTML = '<i class="fas fa-bars"></i>';
+  document.body.appendChild(hamburger);
 }
 
-// === Menu Hambúrguer ===
-const hamburger = document.createElement("button");
-hamburger.classList.add("hamburger");
-hamburger.innerHTML = '<i class="fas fa-bars"></i>';
-document.body.appendChild(hamburger);
+const overlay = document.querySelector(".overlay");
 
-hamburger.addEventListener("click", () => {
+function closeMenu() {
+  document.body.classList.remove("menu-aberto");
+  hamburger.innerHTML = '<i class="fas fa-bars"></i>';
+  hamburger.setAttribute("aria-label", "Abrir menu");
+}
+
+function toggleMenu() {
   document.body.classList.toggle("menu-aberto");
   const aberto = document.body.classList.contains("menu-aberto");
-  hamburger.innerHTML = aberto
-    ? '<i class="fas fa-times"></i>'
-    : '<i class="fas fa-bars"></i>';
-});
+  hamburger.setAttribute("aria-label", aberto ? "Fechar menu" : "Abrir menu");
+  hamburger.innerHTML = aberto ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+}
 
-// Fecha o menu ao clicar em um link no mobile
+hamburger.addEventListener("click", toggleMenu);
+if (overlay) overlay.addEventListener("click", closeMenu);
+
+// Fecha ao clicar em item do menu no mobile
 document.querySelectorAll(".menu-item").forEach((link) => {
   link.addEventListener("click", () => {
-    if (window.innerWidth <= 900) {
-      document.body.classList.remove("menu-aberto");
-      hamburger.innerHTML = '<i class="fas fa-bars"></i>';
-    }
+    if (window.innerWidth <= 980) closeMenu();
   });
 });
 
-// Ajusta automaticamente ao redimensionar
+// Se virar desktop, fecha menu
 window.addEventListener("resize", () => {
-  if (window.innerWidth > 900) {
-    document.body.classList.remove("menu-aberto");
-  }
+  if (window.innerWidth > 980) closeMenu();
 });
 
-// === Alternância de Tema (salva no localStorage) ===
+// Tema (localStorage)
 const themeToggle = document.getElementById("theme-toggle");
 if (themeToggle) {
-  // Aplica tema salvo
   if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark");
     themeToggle.checked = true;
@@ -101,13 +77,10 @@ if (themeToggle) {
   });
 }
 
-// === Acessibilidade: foco visível e navegação por teclado ===
+// A11y foco visível
 document.addEventListener("keyup", (e) => {
-  if (e.key === "Tab") {
-    document.body.classList.add("user-tabbing");
-  }
+  if (e.key === "Tab") document.body.classList.add("user-tabbing");
 });
-
 document.addEventListener("mousedown", () => {
   document.body.classList.remove("user-tabbing");
 });
