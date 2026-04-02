@@ -1,12 +1,16 @@
-// Reveal + Ano
+// Reveal + Animação
 document.addEventListener("DOMContentLoaded", () => {
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) entry.target.classList.add("show");
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+          // Remover observer após animação para melhor performance
+          observer.unobserve(entry.target);
+        }
       });
     },
-    { threshold: 0.15 }
+    { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
   );
 
   document.querySelectorAll(".hidden").forEach((el) => observer.observe(el));
@@ -15,11 +19,39 @@ document.addEventListener("DOMContentLoaded", () => {
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 });
 
-// Ativo no menu (clique)
+// Ativo no menu (clique e scroll)
 document.querySelectorAll(".menu-item").forEach((item) => {
   item.addEventListener("click", function () {
     document.querySelectorAll(".menu-item").forEach((i) => i.classList.remove("active"));
     this.classList.add("active");
+    
+    // Fechar menu em mobile
+    if (window.innerWidth <= 1024) {
+      closeMenu();
+    }
+  });
+});
+
+// Atualizar menu ativo ao fazer scroll
+window.addEventListener("scroll", () => {
+  const sections = document.querySelectorAll("section[id]");
+  const menuItems = document.querySelectorAll(".menu-item");
+  
+  let current = "";
+  sections.forEach((section) => {
+    const sectionTop = section.offsetTop;
+    const sectionHeight = section.clientHeight;
+    if (window.scrollY >= sectionTop - 100) {
+      current = section.getAttribute("id");
+    }
+  });
+  
+  menuItems.forEach((item) => {
+    item.classList.remove("active");
+    const href = item.getAttribute("href");
+    if (href === `#${current}`) {
+      item.classList.add("active");
+    }
   });
 });
 
@@ -65,15 +97,20 @@ window.addEventListener("resize", () => {
 
 // Tema (localStorage)
 const themeToggle = document.getElementById("theme-toggle");
+const themeIcon = document.querySelector(".toggle-theme i");
 if (themeToggle) {
   if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark");
     themeToggle.checked = true;
+    themeIcon.className = "fas fa-moon";
+  } else {
+    themeIcon.className = "fas fa-sun";
   }
 
   themeToggle.addEventListener("change", () => {
     document.body.classList.toggle("dark");
     localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    themeIcon.className = document.body.classList.contains("dark") ? "fas fa-moon" : "fas fa-sun";
   });
 }
 
